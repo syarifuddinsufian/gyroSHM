@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <link rel="icon" type="image/x-icon" href="https://img.freepik.com/premium-vector/building-logo-vector-illustration-designreal-estate-logo-template-logo-symbol-icon_9999-20231.jpg">
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href='https://fonts.googleapis.com/css?family=Orbitron' rel='stylesheet'>
+  <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+  <title>SHM Gyro Sensors</title>
+  <style>
+    html, body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+    }
+
+    header {
+        height: 80px;
+        background-color: #ffffff;
+        display: flex;
+        align-items: center;
+        padding-left: 20px;
+        box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+        font-family: 'Orbitron';
+        font-size: 30px;
+        font-weight: bolder;
+        color: #0c496fff;
+        gap: 20px;
+    }
+
+    header img {
+        height: 60px;
+    }
+
+    .bodyContainer {
+        height: calc(100% - 80px);
+        display: flex;
+        justify-content: center;
+        padding: 20px;
+        box-sizing: border-box;
+    }
+
+    .grid {
+        display: flex;
+        width: 100%;
+        max-width: 90%;
+        /* max-width: 1200px; */
+        gap: 20px;
+    }
+
+    .column {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        gap: 20px;
+    }
+
+    .box {
+        background-color: #ffffff;
+        border: 5px solid #0c496fff;
+        font-family: Arial, sans-serif;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        border-radius: 0; /* Removed rounded corners */
+    }
+
+    /* Each column has 3 full height + 1 half height = 3.5 total fractions */
+    .datetime {
+        flex: 0 0 calc((100% - 60px) / 14); /* 1/7 of total space */
+        padding: 10px;
+        font-size: 2rem;
+    }
+
+    .angle {
+        flex: 1 1 calc((100% - 60px) / 3.5); /* remaining divided equally by 3 */
+        padding: 20px;
+        font-size: 4rem;
+    }
+
+    .channel-label {
+        font-family: 'Arial', sans-serif;
+        font-size: 2rem;
+        font-weight: bold;
+        text-align: center;
+        color: #0c496f;
+        margin-bottom: -10px;
+    }
+
+    .refresh-button {
+    height: 75%;
+    padding: 10px;
+    aspect-ratio: 1 / 1;
+    cursor: pointer;
+    transition: opacity 0.3s;
+    margin-left: auto;
+    }
+
+    .refresh-button:hover {
+    opacity: 0.5;
+    }
+
+  </style>
+</head>
+<body>
+  <header>
+    <img src="https://img.freepik.com/premium-vector/building-logo-vector-illustration-designreal-estate-logo-template-logo-symbol-icon_9999-20231.jpg" alt="Logo" />
+    SHM Gyroscope Sensor
+    <img
+        src="https://images.icon-icons.com/1380/PNG/512/vcsupdaterequired_93493.png"
+        alt="Refresh"
+        class="refresh-button"
+        onclick="location.reload()"
+    />
+  </header>
+
+  <div class="bodyContainer">
+    <div class="grid">
+        <!-- Column 1: Gyro 1 -->
+        <div class="column">
+        <div class="channel-label">CHANNEL 1</div>
+        <div class="box datetime" id="datetime1">Loading...</div>
+        <div class="box angle" id="x1">X: </div>
+        <div class="box angle" id="y1">Y: </div>
+        <div class="box angle" id="z1">Z: </div>
+        </div>
+
+        <!-- Column 2: Gyro 2 -->
+        <div class="column">
+        <div class="channel-label">CHANNEL 2</div>
+        <div class="box datetime" id="datetime2">Loading...</div>
+        <div class="box angle" id="x2">X: --</div>
+        <div class="box angle" id="y2">Y: --</div>
+        <div class="box angle" id="z2">Z: --</div>
+        </div>
+    </div>
+  </div>
+
+  <script>
+    let arrayOfArrays, formattedData;
+    google.charts.load('current', {'packages':['corechart']});
+    google.charts.setOnLoadCallback(() => {
+        getSensorData();
+        setInterval(getSensorData, 60000); // Refresh every 5 seconds
+    });
+
+    function getSensorData() {
+      console.log("fetching data");
+      fetch('https://script.google.com/macros/s/AKfycbxD0MJTr0h8i2uDllH9Sw17Fv7ukgN2apymZeV41TU1DjeONVQZKubjKCwkZJHtLLEr/exec')
+        .then(res => res.json())
+        .then(data => {
+          arrayOfArrays = data;
+          formattedData = JSON.stringify(arrayOfArrays, null, 2);
+          console.log(formattedData);
+
+          // Update DOM with sensor data
+            document.getElementById('datetime1').innerHTML = `Last Update:<br>${data.gyro1.datetime}`;
+            document.getElementById('x1').textContent = `X: ${data.gyro1.x}°`;
+            document.getElementById('y1').textContent = `Y: ${data.gyro1.y}°`;
+            document.getElementById('z1').textContent = `Z: ${data.gyro1.z}°`;
+
+            document.getElementById('datetime2').innerHTML = `Last Update:<br>${data.gyro2.datetime}`;
+            document.getElementById('x2').textContent = `X: ${data.gyro2.x}°`;
+            document.getElementById('y2').textContent = `Y: ${data.gyro2.y}°`;
+            document.getElementById('z2').textContent = `Z: ${data.gyro2.z}°`;
+        })
+        .catch(error => console.error('Error:', error));
+    }
+  </script>
+</body>
+</html>
