@@ -92,7 +92,7 @@
 
     .refresh-button {
     height: 75%;
-    padding: 10px;
+    padding: 20px;
     aspect-ratio: 1 / 1;
     cursor: pointer;
     transition: opacity 0.3s;
@@ -114,6 +114,7 @@
         alt="Refresh"
         class="refresh-button"
         onclick="location.reload()"
+        title="Refresh data..."
     />
   </header>
 
@@ -140,7 +141,13 @@
   </div>
 
   <script>
+    let userInteracted = false;
     let arrayOfArrays, formattedData;
+
+    window.addEventListener('click', () => userInteracted = true);
+    window.addEventListener('DOMContentLoaded', () => {
+      document.getElementById('beep').volume = 1; // Set to 100% volume
+    });
     google.charts.load('current', {'packages':['corechart']});
     google.charts.setOnLoadCallback(() => {
         getSensorData();
@@ -166,9 +173,16 @@
             document.getElementById('x2').textContent = `X: ${data.gyro2.x}°`;
             document.getElementById('y2').textContent = `Y: ${data.gyro2.y}°`;
             document.getElementById('z2').textContent = `Z: ${data.gyro2.z}°`;
+
+            setTimeout(() => {
+              if (userInteracted) {
+                document.getElementById('beep').play().catch(() => {});
+              }
+            }, 500);
         })
         .catch(error => console.error('Error:', error));
     }
   </script>
+  <audio id="beep" src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg" preload="auto"></audio>
 </body>
 </html>
